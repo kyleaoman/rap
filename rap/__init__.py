@@ -1,2 +1,2 @@
-from _rap import Rap
-from _demo import demo
+from ._rap import Rap
+from ._demo import demo
