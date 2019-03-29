@@ -1,8 +1,6 @@
 import os
 import numpy as np
-import matplotlib.pyplot as pp
 import emcee
-import corner
 from itertools import product
 
 
@@ -61,6 +59,8 @@ class Rap(object):
 
     def cornerfig(self, save=None, save_format='pdf', fignum=None,
                   labels=None, truths=None):
+        import corner
+        import matplotlib.pyplot as pp
         if self.results is None:
             raise RuntimeError('Run fit before trying to create plot.')
         if labels is None:
