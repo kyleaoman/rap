@@ -14,7 +14,7 @@ def demo():
 
     R = Rap(model)
     guess = [np.array([1, 0]) + np.random.rand(2) * .01 for i in range(10)]
-    R.fit(guess, niter=5500, burn=500, parallel=True)
+    R.fit(guess, niter=5500, burn=500, parallel=8)
     with PdfPages('demo.pdf') as pdffile:
         R.cornerfig(save=pdffile, save_format='pdf', fignum=1,
                     labels=['a', 'b'], truths=truths)

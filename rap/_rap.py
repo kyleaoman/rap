@@ -68,7 +68,7 @@ class Rap(object):
         cornerfig = pp.figure(fignum,
                               figsize=(1.5 * self.ndim, 1.5 * self.ndim))
         pp.clf()
-        axes = {}
+        axes = dict()
         for spn in range(self.ndim ** 2):
             axes[(spn // self.ndim, spn % self.ndim)] = \
                 cornerfig.add_subplot(self.ndim, self.ndim, spn + 1)
@@ -80,10 +80,11 @@ class Rap(object):
             levels=1.0 - np.exp(-0.5 * np.array([1, 2, 3]) ** 2),
             fill_contours=True,
             plot_datapoints=False,
+            color='red',
             plot_density=False,
-            hist_kwargs=dict(histtype='stepfilled', color='#CCCCCC',
-                             ec='black'),
-            quantiles=(.3173 / 2, 1 - .3173 / 2),
+            hist_kwargs=dict(histtype='stepfilled', color='#FFCCCC',
+                             ec='red'),
+            quantiles=(.3173 / 2, .5, 1 - .3173 / 2),
             bins=25,
             smooth=(1., 1.)
         )
@@ -92,15 +93,80 @@ class Rap(object):
             if row == col:  # diagonal
                 pp.axvline(
                     x=self.results['theta_ml'][col],
-                    color='red',
+                    color='#AA0000',
                     ls='solid'
                 )
+                try:
+                    bounds = self.model.prior_bounds
+                except AttributeError:
+                    pass
+                else:
+                    pp.xlim(bounds[row])
             elif col < row:  # lower left
                 x = self.results['theta_ml'][col],
                 y = self.results['theta_ml'][row],
-                pp.plot(x, y, marker='*', mec='red', mfc='red', ls='None')
+                pp.plot(x, y, marker='*', mec='#AA0000', mfc='#AA0000',
+                        ls='None')
+                try:
+                    bounds = self.model.prior_bounds
+                except AttributeError:
+                    pass
+                else:
+                    pp.xlim(bounds[col])
+                    pp.ylim(bounds[row])
             if col <= row:
                 pp.tick_params(labelsize=8)
+        if save is not None:
+            pp.savefig(save, format=save_format)
+        return axes
+
+    def overplot_cornerfig(self, cornerfig, axes, save=None, save_format='pdf',
+                           truths=None):
+        import corner
+        import matplotlib.pyplot as pp
+        if self.results is None:
+            raise RuntimeError('Run fit before trying to create plot.')
+        corner.corner(
+            self.results['thetas'],
+            fig=cornerfig,
+            truths=truths,
+            levels=1.0 - np.exp(-0.5 * np.array([1, 2, 3]) ** 2),
+            fill_contours=True,
+            contourf_kwargs=dict(alpha=0),
+            color='#92A2B2',
+            plot_datapoints=False,
+            plot_density=False,
+            hist_kwargs=dict(histtype='step', color='#92A2B2'),
+            quantiles=(.3173 / 2, .5, 1 - .3173 / 2),
+            bins=25,
+            smooth=(1., 1.)
+        )
+        for row, col in product(range(self.ndim), range(self.ndim)):
+            pp.sca(axes[(row, col)])
+            if row == col:  # diagonal
+                pp.axvline(
+                    x=self.results['theta_ml'][col],
+                    color='slategray',
+                    ls='solid'
+                )
+                try:
+                    bounds = self.model.prior_bounds
+                except AttributeError:
+                    pass
+                else:
+                    pp.xlim(bounds[row])
+            elif col < row:  # lower left
+                x = self.results['theta_ml'][col],
+                y = self.results['theta_ml'][row],
+                pp.plot(x, y, marker='*', mec='slategray', mfc='slategray',
+                        ls='None')
+                try:
+                    bounds = self.model.prior_bounds
+                except AttributeError:
+                    pass
+                else:
+                    pp.xlim(bounds[col])
+                    pp.ylim(bounds[row])
         if save is not None:
             pp.savefig(save, format=save_format)
         return
