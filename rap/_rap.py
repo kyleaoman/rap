@@ -91,6 +91,7 @@ class Rap(object):
         for row, col in product(range(self.ndim), range(self.ndim)):
             pp.sca(axes[(row, col)])
             if row == col:  # diagonal
+                pp.yticks([])
                 pp.axvline(
                     x=self.results['theta_ml'][col],
                     color='#AA0000',
@@ -131,8 +132,7 @@ class Rap(object):
             fig=cornerfig,
             truths=truths,
             levels=1.0 - np.exp(-0.5 * np.array([1, 2, 3]) ** 2),
-            fill_contours=True,
-            contourf_kwargs=dict(alpha=0),
+            no_fill_contours=True,
             color='#92A2B2',
             plot_datapoints=False,
             plot_density=False,
